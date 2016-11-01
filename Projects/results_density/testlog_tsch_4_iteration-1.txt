@@ -1,0 +1,19 @@
+Random seed: 17479
+4;1757872128; 1808662546; 2275868672; 2046821195; 6;112;0
+2;624230400; 1355612181; 2538799104; 1782907723; 6;110;0
+5;1588330496; 2458124303; 284950528; 4037673803; 6;110;0
+3;336265216; 1382809621; 2523725824; 1797915467; 6;112;0
+outs_count[2] = 239 total_subscribed = 239
+outs_count[3] = 239 total_subscribed = 478
+outs_count[4] = 239 total_subscribed = 717
+outs_count[5] = 239 total_subscribed = 956
+total_nodes:4
+PowerTracker: Extracted statistics REAL:
+AVG ON 123162853s 1.710%
+AVG TX 3429189s 0.048%
+AVG RX 2766996s 0.037%
+AVG IDLE LISTENING 116966668s 1.625%
+AVG INT 17600s 0.000%
+
+TEST OK
+Test ended at simulation time: 7200000013

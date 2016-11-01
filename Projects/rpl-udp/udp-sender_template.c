@@ -28,20 +28,35 @@
  */
 
 #include "contiki.h"
+#include "node-id.h"//TSCH
+#include "net/rpl/rpl.h" //TSCH
+#include "net/ipv6/uip-ds6-route.h" //TSCH
+#include "net/mac/tsch/tsch.h" //TSCH
+#include "net/mac/tsch/tsch-security.h"
+#include "net/llsec/llsec802154.h"
+
+#if WITH_ORCHESTRA//TSCH
+#include "orchestra.h"//TSCH
+#endif /* WITH_ORCHESTRA *///TSCH
 #include "lib/random.h"
 #include "sys/ctimer.h"
 #include "net/ip/uip.h"
 #include "net/ipv6/uip-ds6.h"
 #include "net/ip/uip-udp-packet.h"
-#include "sys/ctimer.h"
 #ifdef WITH_COMPOWER
 #include "powertrace.h"
 #endif
+#include "contiki-lib.h"
+#include "contiki-net.h"
+#include "dev/serial-line.h"
+#if CONTIKI_TARGET_Z1
+#include "dev/uart0.h"
+#else
+#include "dev/uart1.h"
+#endif
 #include <stdio.h>
 #include <string.h>
-#include "net/rpl/rpl.h"
 #include "simstats.h"
-
 #define UDP_CLIENT_PORT 8765
 #define UDP_SERVER_PORT 5678
 
@@ -68,8 +83,10 @@ static unsigned int app_bytes;
 static unsigned int app_bytesl2=0;
 
 /*---------------------------------------------------------------------------*/
+PROCESS(node_process, "RPL Node");
 PROCESS(udp_client_process, "UDP client process");
-AUTOSTART_PROCESSES(&udp_client_process);
+
+AUTOSTART_PROCESSES(&node_process,&udp_client_process);
 /*---------------------------------------------------------------------------*/
 static void
 tcpip_handler(void)
@@ -94,7 +111,7 @@ send_packet(void *ptr)
 
 	seq_id++;
 	total_pkts++;
-	if(seq_id == 0) {
+	if(seq_id == 256) {
 		/* Wrap to 128 to identify restarts */
 		seq_id = 128;
 	}
@@ -167,6 +184,55 @@ set_global_address(void)
 #endif
 }
 /*---------------------------------------------------------------------------*/
+PROCESS_THREAD(node_process, ev, data)
+{
+  //static struct etimer et;
+  PROCESS_BEGIN();
+
+  static int is_coordinator = 0;
+  
+  /* Set node with ID == 1 as coordinator, convenient in Cooja. */
+  if(node_id == 1) {
+	  is_coordinator=1;
+  }
+  tsch_set_pan_secured((node_id == 1));
+  uip_ipaddr_t *br_prefix=NULL;
+  if(is_coordinator) {
+    uip_ipaddr_t prefix;
+    uip_ip6addr(&prefix, UIP_DS6_DEFAULT_PREFIX, 0, 0, 0, 0, 0, 0, 0);
+    br_prefix=&prefix;
+  } else {
+	  br_prefix=NULL;
+  }
+  
+  uip_ipaddr_t global_ipaddr;
+
+   if(br_prefix) { /* We are RPL root. Will be set automatically
+                      as TSCH pan coordinator via the tsch-rpl module */
+     memcpy(&global_ipaddr, br_prefix, 16);
+     uip_ds6_set_addr_iid(&global_ipaddr, &uip_lladdr);
+     uip_ds6_addr_add(&global_ipaddr, 0, ADDR_AUTOCONF);
+     rpl_set_root(RPL_DEFAULT_INSTANCE, &global_ipaddr);
+     rpl_set_prefix(rpl_get_any_dag(), br_prefix, 64);
+     rpl_repair_root(RPL_DEFAULT_INSTANCE);
+   }
+
+   NETSTACK_MAC.on();
+#if WITH_ORCHESTRA
+  orchestra_init();
+#endif /* WITH_ORCHESTRA */
+
+  /*etimer_set(&et, CLOCK_SECOND * 300);
+  while(1) {
+
+      PROCESS_YIELD_UNTIL(etimer_expired(&et));
+      etimer_reset(&et);
+    }*/
+
+  PROCESS_END();
+}
+
+
 PROCESS_THREAD(udp_client_process, ev, data)
 {
 	static struct etimer periodic;
@@ -177,7 +243,7 @@ PROCESS_THREAD(udp_client_process, ev, data)
 	static struct etimer et;
 	PROCESS_BEGIN();
 
-	etimer_set(&et, 100 * CLOCK_SECOND);
+	etimer_set(&et, 1700 * CLOCK_SECOND);
 
 	PROCESS_PAUSE();
 

@@ -162,5 +162,5 @@ orchestra_init(void)
       all_rules[i]->init(i);
     }
   }
-  PRINTF("Orchestra: initialization done\n");
+  printf("Orchestra: initialization done\n");
 }

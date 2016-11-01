@@ -436,6 +436,11 @@ frame802154_create(frame802154_t *p, uint8_t *buf)
 #endif /* LLSEC802154_USES_EXPLICIT_KEYS */
   }
 #endif /* LLSEC802154_USES_AUX_HEADER */
+  int i=0;
+  for (i=0; i<pos; i++){
+	  printf("%x ", buf[i]);
+  }
+  printf("\n");
 
   return (int)pos;
 }

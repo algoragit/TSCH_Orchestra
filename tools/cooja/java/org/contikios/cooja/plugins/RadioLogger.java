@@ -151,7 +151,7 @@ public class RadioLogger extends VisPlugin {
   private JTextField searchField = new JTextField(30);
 
   public RadioLogger(final Simulation simulationToControl, final Cooja gui) {
-    super("Radio messages", gui);
+    super("Radio messages", gui, false);
     setLayout(new BorderLayout());
 
     simulation = simulationToControl;

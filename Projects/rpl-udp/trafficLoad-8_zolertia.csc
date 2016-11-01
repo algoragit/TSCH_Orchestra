@@ -8,7 +8,7 @@
   <project EXPORT="discard">[APPS_DIR]/powertracker</project>
   <simulation>
     <title>BMRF-test-z1</title>
-    <randomseed>26921</randomseed>
+    <randomseed>2400</randomseed>
     <motedelay_us>1000000</motedelay_us>
     <radiomedium>
       org.contikios.cooja.radiomediums.UDGM
@@ -329,9 +329,9 @@ importClass(java.util.ArrayList);&#xD;
 var v = new ArrayList();&#xD;
 importPackage(java.io);&#xD;
 &#xD;
-simulation_time = 3000000;&#xD;
+simulation_time = 7200000;&#xD;
 &#xD;
-TIMEOUT(3000000, timeout_func()); /* milliseconds */&#xD;
+TIMEOUT(7200000, timeout_func()); /* milliseconds */&#xD;
 &#xD;
 outs_count = new Array(10);&#xD;
 outs = new Array(256);&#xD;
@@ -366,7 +366,6 @@ tfdelay = new FileWriter(fd);&#xD;
 tfsummary = new FileWriter(fs);&#xD;
 tfduplicates = new FileWriter(fdup);&#xD;
 tfraw_duplicates = new FileWriter(frawdup);&#xD;
-&#xD;
 timeout_func = function simulationEnd() {&#xD;
   plugin = mote.getSimulation().getCooja().getStartedPlugin("org.contikios.cooja.plugins.RadioLogger");&#xD;
   if (plugin != null) {
@@ -380,12 +379,15 @@ timeout_func = function simulationEnd() {&#xD;
   highest_node=0;&#xD;
   if (plugin != null) {&#xD;
       for (i=2; i&lt;12; i++){&#xD;
-      total_subscribed += outs_count[i];&#xD;
       if (outs_count[i]&gt;0){&#xD;
+          tfsummary.write(outs_count[i] + ";");&#xD;
+          total_subscribed += outs_count[i];&#xD;
           total_nodes++;&#xD;
           highest_node=i;&#xD;
+      } else{&#xD;
+          tfsummary.write("0;");&#xD;
       }&#xD;
-      log.log("outs_count["+id+"] = "+outs_count[i]+ " total_subscribed = " + total_subscribed + "\n");&#xD;
+      log.log("outs_count["+i+"] = "+outs_count[i]+ " total_subscribed = " + total_subscribed + "\n");&#xD;
   }&#xD;
   log.log("total_nodes:"+total_nodes+"\n");&#xD;
     stats = plugin.radioStatistics();&#xD;
@@ -442,13 +444,12 @@ timeout_func = function simulationEnd() {&#xD;
     }&#xD;
     idle_listening_real_time = (splited_on_real_time - splited_tx_real_time - splited_rx_real_time);&#xD;
     idle_listening_real_pcent = (splited_on_real_pcent - splited_tx_real_pcent - splited_rx_real_pcent);&#xD;
-    tfsummary.write("PowerTracker: Extracted statistics REAL:\n"&#xD;
-    + "AVG ON " + (splited_on_real_time/total_nodes).toFixed(0) + "s " + (splited_on_real_pcent/total_nodes).toFixed(3) + "%" +"\n"&#xD;
-    + "AVG TX " + (splited_tx_real_time/total_nodes).toFixed(0) + "s " + (splited_tx_real_pcent/total_nodes).toFixed(3) + "%" + "\n"&#xD;
-    + "AVG RX " + (splited_rx_real_time/total_nodes).toFixed(0) + "s " + (splited_rx_real_pcent/total_nodes).toFixed(3) + "%" + "\n"&#xD;
-    + "AVG IDLE LISTENING " + (idle_listening_real_time/total_nodes).toFixed(0) + "s " + (idle_listening_real_pcent/total_nodes).toFixed(3) + "%" + "\n"&#xD;
-    + "AVG INT " + (splited_int_real_time/total_nodes).toFixed(0) + "s " + (splited_int_real_pcent/total_nodes).toFixed(3) + "%" + "\n"&#xD;
-    + "\n");&#xD;
+    tfsummary.write(&#xD;
+      (splited_on_real_time/total_nodes).toFixed(0) + ";" + (splited_on_real_pcent/total_nodes).toFixed(3) +";"&#xD;
+      + (splited_tx_real_time/total_nodes).toFixed(0) + ";" + (splited_tx_real_pcent/total_nodes).toFixed(3) + ";"&#xD;
+      + (splited_rx_real_time/total_nodes).toFixed(0) + ";" + (splited_rx_real_pcent/total_nodes).toFixed(3) + ";"&#xD;
+      + (idle_listening_real_time/total_nodes).toFixed(0) + ";" + (idle_listening_real_pcent/total_nodes).toFixed(3) + ";"&#xD;
+      + (splited_int_real_time/total_nodes).toFixed(0) + ";" + (splited_int_real_pcent/total_nodes).toFixed(3));&#xD;
     log.log("PowerTracker: Extracted statistics REAL:\n"&#xD;
     + "AVG ON " + (splited_on_real_time/total_nodes).toFixed(0) + "s " + (splited_on_real_pcent/total_nodes).toFixed(3) + "%" +"\n"&#xD;
     + "AVG TX " + (splited_tx_real_time/total_nodes).toFixed(0) + "s " + (splited_tx_real_pcent/total_nodes).toFixed(3) + "%" + "\n"&#xD;
@@ -476,14 +477,14 @@ timeout_func = function simulationEnd() {&#xD;
   //log.log("LPM time: " + (lpm_time/total_nodes) + " = " + ((lpm_time/total_nodes)/32768) + " s" + "\n");&#xD;
   //log.log("CPU time: " + (cpu_time/total_nodes) + " = " + ((cpu_time/total_nodes)/32768) + " s" + "\n");&#xD;
 &#xD;
-  tfsummary.write("Average end-to-end delay: " + (total_time/total_ins).toFixed(5) +"s\n");&#xD;
-  tfsummary.write("Packet delivery ratio: " + total_ins + "/" + total_subscribed + "=" + (total_ins/total_subscribed).toFixed(3) + "\n");&#xD;
-  tfsummary.write("Frame transmission: " + (frame_tx/total_nodes).toFixed(3) + "\n");&#xD;
-  tfsummary.write("Packet transmission: " + (msg_tx/total_nodes).toFixed(3) + "\n");&#xD;
-  tfsummary.write("Rx time: " + (rx_time/total_nodes).toFixed(3) + " = " + ((rx_time/total_nodes)/32768).toFixed(3) + " s" + "\n");&#xD;
-  tfsummary.write("Tx time: " + (tx_time/total_nodes).toFixed(3) + " = " + ((tx_time/total_nodes)/32768).toFixed(3) + " s" + "\n");&#xD;
-  tfsummary.write("LPM time: " + (lpm_time/total_nodes).toFixed(3) + " = " + ((lpm_time/total_nodes)/32768).toFixed(3) + " s" + "\n");&#xD;
-  tfsummary.write("CPU time: " + (cpu_time/total_nodes).toFixed(3) + " = " + ((cpu_time/total_nodes)/32768).toFixed(3) + " s" + "\n");&#xD;
+  tfsummary.write(";" + (total_time/total_ins).toFixed(5) +";"&#xD;
+    + total_ins + ";" + total_subscribed + ";" + (total_ins/total_subscribed).toFixed(3) + ";"&#xD;
+    + (frame_tx/total_nodes).toFixed(3) + ";"&#xD;
+    + (msg_tx/total_nodes).toFixed(3) + ";"&#xD;
+    + (rx_time/total_nodes).toFixed(3) + ";" + ((rx_time/total_nodes)/32768).toFixed(3) + ";"&#xD;
+    + (tx_time/total_nodes).toFixed(3) + ";" + ((tx_time/total_nodes)/32768).toFixed(3) + ";"&#xD;
+    + (lpm_time/total_nodes).toFixed(3) + ";" + ((lpm_time/total_nodes)/32768).toFixed(3) + ";"&#xD;
+    + (cpu_time/total_nodes).toFixed(3) + ";" + ((cpu_time/total_nodes)/32768).toFixed(3) + "\n");&#xD;
     &#xD;
   //tflog.close();&#xD;
   tfraw.close();&#xD;
@@ -513,7 +514,7 @@ while(true){&#xD;
       //log.log("Delay: "+time_msg+" + "+outs[parseInt(message[1])]+" = "+(time_msg - outs[parseInt(message[1])])+"\n");&#xD;
       //log.log("test INS");&#xD;
       //log.log(""+parseInt(message[1])+";"+id+";"+(time_msg - outs[parseInt(message[1])])+"\n");&#xD;
-      tfdelay.write(""+parseInt(message[2])+";"+parseInt(message[1])+";"+(time_msg - outs[parseInt(message[1])][parseInt(message[2])])+"\n");&#xD;
+      tfdelay.write(""+parseInt(message[2])+";"+parseInt(message[1])+";"+(time_msg - outs[parseInt(message[1])][parseInt(message[2])])+";"+parseInt(message[3])+"\n");&#xD;
       //log.log(""+parseInt(message[1])+";"+parseInt(message[2])+";"+(time_msg - outs[parseInt(message[1])][parseInt(message[2])])+"\n");&#xD;
     }else if (message[0]=="Duplicates") {&#xD;
       tfduplicates.write(""+id+";"+parseInt(message[1])+"\n");&#xD;
@@ -529,6 +530,7 @@ while(true){&#xD;
     cpu_time += parseInt(message[4]);&#xD;
     //tfraw.write((time_msg_seconds/60|0) + ":" + (time_msg_seconds % 60).toFixed(3) + ";ID:" + id + ";" + id + ";" + msg + "\n");&#xD;
     tfraw.write(id + ";" + msg + "\n");&#xD;
+    log.log(id + ";" + msg + "\n");&#xD;
   }&#xD;
 }</script>
       <active>true</active>

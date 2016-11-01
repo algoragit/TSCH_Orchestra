@@ -3,7 +3,7 @@
 POSITION="XorYcoords"
 MOTE_IDENT="moteIdentifier"
 SIMSPERSCENARIO=4
-SIMSPERLOAD=1
+SIMSPERLOAD=10
 
 declare -a RESULTFILES=('raw' 'delay' 'summary' 'duplicates' 'duplicates_raw');
 declare -a PERCENTTOPOLOGIES=('25' '50' '75' '100');
@@ -19,8 +19,9 @@ declare -a THRESHOLDCONF=(  '1' '1' '1' '2'
 
 declare -a BASEFILES=('base_file_1')
 
-#declare -a PERIODVALUES=('480' '240' '120' '60' '30' '15' '8' '4' '2' '1');
-declare -a PERIODVALUES=('8' '4');
+declare -a PERIODVALUES=('0');
+#declare -a PERIODVALUES=('120' '60' '30' '15' '8');
+#declare -a PERIODVALUES=('8' '4');
 
 declare -a remaining_motes=()
 declare -a remaining_motes_aux=()
@@ -41,8 +42,8 @@ do
         for ((i=0; i<${#PERIODVALUES[@]}; ++i)) 
         do
             echo "Loading project-conf"
-            cp udp-sender_template.c udp-sender.c
-            sed -i s/\#load\#/${PERIODVALUES[i]}/ udp-sender.c
+            # cp udp-sender_template.c udp-sender.c
+            # sed -i s/\#load\#/${PERIODVALUES[i]}/ udp-sender.c
 
             
             for ((j=1; j <= $SIMSPERLOAD; j++))
@@ -60,10 +61,11 @@ do
 
                 for filename in "${RESULTFILES[@]}"
                 do
-                    mv $filename"_results.csv" $topology"/"$filename"_results_"${PERIODVALUES[i]}"_iteration-"$j".csv"
+                    mv $filename"_results.csv" $topology"/tsch_"$filename"_results_"${PERIODVALUES[i]}"_iteration-"$j".csv"
                 done
 
-                mv "packets.dat" $topology"/"$packets"_"${PERIODVALUES[i]}"_iteration-"$j".dat"
+                mv "packets.dat" $topology"/tsch_"${PERIODVALUES[i]}"_iteration-"$j".dat"
+                mv "COOJA.testlog" $topology"/testlog_tsch_"${PERIODVALUES[i]}"_iteration-"$j".txt"
             done 
             #rm udp-sender.c
         done
@@ -72,5 +74,4 @@ do
         #do
         #    rm "trafficLoad-"$topologie"_zolertia.csc"
         #done
-    done
 done

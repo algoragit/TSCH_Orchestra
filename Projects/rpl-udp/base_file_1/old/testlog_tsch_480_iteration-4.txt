@@ -1,0 +1,31 @@
+Random seed: 27572
+9;2904358912; 939982907; 1088094208; 3233547082; 7;6;0
+10;293863424; 948633639; 799342592; 3523281739; 6;4;0
+6;1114505216; 1063387166; 1550909440; 2770731851; 6;6;0
+11;4014931968; 952434723; 1599406080; 2721776459; 6;6;0
+4;2864709632; 1054277679; 2218590208; 2103116618; 7;4;0
+7;191102976; 955580443; 3838771200; 482870091; 6;6;0
+8;868352000; 924254273; 590413824; 3731227466; 7;6;0
+3;471203840; 1120665621; 3469344768; 852362059; 6;4;0
+2;106037248; 1065746456; 3206676480; 1114964811; 6;6;0
+5;2269904896; 934871084; 3916169216; 405537610; 7;4;0
+outs_count[2] = 14 total_subscribed = 14
+outs_count[3] = 14 total_subscribed = 28
+outs_count[4] = 14 total_subscribed = 42
+outs_count[5] = 14 total_subscribed = 56
+outs_count[6] = 14 total_subscribed = 70
+outs_count[7] = 14 total_subscribed = 84
+outs_count[8] = 14 total_subscribed = 98
+outs_count[9] = 14 total_subscribed = 112
+outs_count[10] = 14 total_subscribed = 126
+outs_count[11] = 14 total_subscribed = 140
+total_nodes:10
+PowerTracker: Extracted statistics REAL:
+AVG ON 162194791s 2.253%
+AVG TX 2111098s 0.030%
+AVG RX 1956589s 0.024%
+AVG IDLE LISTENING 158127104s 2.199%
+AVG INT 20295s 0.000%
+
+TEST OK
+Test ended at simulation time: 7200003259
